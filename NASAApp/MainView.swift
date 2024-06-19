@@ -49,14 +49,25 @@ struct MainView: View {
                 if let selectedPicture = selectedPicture {
                     switch selectedPicture.mediaType {
                     case .image:
-                        AsyncImage(url: URL(string: selectedPicture.hdurl ?? selectedPicture.url)) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .ignoresSafeArea()
-                                .onTapGesture(perform: toggleUI)
-                        } placeholder: {
-                            ProgressView()
+                        AsyncImage(url: URL(string: selectedPicture.hdurl ?? selectedPicture.url)) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .ignoresSafeArea()
+                                    .onTapGesture(perform: toggleUI)
+                            case .failure(let error):
+                                Text(error.localizedDescription)
+                                    .font(.headline)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding()
+                            @unknown default:
+                                fatalError()
+                            }
                         }
                         .id(selectedPicture.date)
                     case .video:
