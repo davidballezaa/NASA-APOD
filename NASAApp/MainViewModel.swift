@@ -24,16 +24,10 @@ class MainViewModel {
         }
         
         // Real API call
-        var url = URL(string: "https://api.nasa.gov/planetary/apod")!
-        url.append(queryItems: [
-            URLQueryItem(name: "api_key", value: "wqAghCDBRjVryee2sxAe7PuATpfa2pztxmVgmBSh"),
-            URLQueryItem(name: "date", value: selectedDateText),
-        ])
+        // ...
         
-        let (data, _) = try await URLSession.shared.data(from: url)
-        let picture = try JSONDecoder().decode(PictureOfTheDay.self, from: data)
-        
-        return picture
+        try await Task.sleep(for: .seconds(1))
+        return mockPicture
     }
     
     let dateFormatter: DateFormatter = {
