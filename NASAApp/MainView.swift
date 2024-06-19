@@ -41,12 +41,34 @@ struct MainView: View {
                 Color.black
                 
                 if let selectedPicture = selectedPicture {
-                    // switch selectedPicture.mediaType ...
+                    switch selectedPicture.mediaType {
+                    case .image:
+                        AsyncImage(url: URL(string: selectedPicture.hdurl ?? selectedPicture.url)) {
+                            phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView() // Loading circle
+                            case .success(let image):
+                                image.resizable()
+                            case .failure(let error):
+                                Text(error.localizedDescription)
+                            @unknown default:
+                                fatalError()
+                            }
+                        }
+                    case .video:
+                        WebView(url: URL(string: selectedPicture.url)!)
+                    }
                 }
             }
             .ignoresSafeArea()
         }
-        // ...
+        .task {
+            downloadIfNeeded()
+        }
+        .onChange(of: viewModel.selectedDate, {
+            downloadIfNeeded()
+        })
     }
     
     func toggleUI() {
@@ -55,7 +77,18 @@ struct MainView: View {
         }
     }
     
-    // func downloadIfNeeded() ...
+    func downloadIfNeeded() {
+        if selectedPicture == nil {
+            Task { // helper to allow async operations
+                do {
+                    let picture = try await viewModel.downloadData()
+                    modelContext.insert(picture)
+                } catch {
+                    
+                }
+            }
+        }
+    }
 }
 
 #Preview {

@@ -15,8 +15,13 @@ struct PictureView: View {
             Spacer()
             VStack(spacing: 8) {
                 Text(picture.title)
+                    .font(.title3.bold())
+                    .multilineTextAlignment(.center)
                 Text(picture.copyright?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "NASA")
+                    .foregroundStyle(.secondary)
             }
+            .padding()
+            .background(Material.regular, in: RoundedRectangle(cornerRadius: 16))
         }
     }
 }
